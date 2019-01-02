@@ -1,5 +1,6 @@
 var React = require("react");
 var PropTypes = require("prop-types");
+var Link = require("react-router-dom").Link;
 
 function PlayerPreview(props) {
 	return (
@@ -94,6 +95,7 @@ class Battle extends React.Component {
 		};
 
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleReset = this.handleReset.bind(this);
 	}
 
 	handleSubmit(id, username) {
@@ -106,10 +108,22 @@ class Battle extends React.Component {
 			return newState;
 		});
 	}
+	handleReset(id) {
+		this.setState(function() {
+			var newState = {};
+			newState[id + "Name"] = "";
+			newState[id + "Image"] = null;
+
+			return newState;
+		});
+	}
 
 	render() {
+		var match = this.props.match;
 		var playerOneName = this.state.playerOneName;
 		var playerTwoName = this.state.playerTwoName;
+		var playerOneImage = this.state.playerOneImage;
+		var playerTwoImage = this.state.playerTwoImage;
 
 		return (
 			<div>
@@ -122,6 +136,15 @@ class Battle extends React.Component {
 						/>
 					)}
 
+					{playerOneImage !== null && (
+						<PlayerPreview
+							avatar={playerOneImage}
+							username={playerOneName}
+							onReset={this.handleReset}
+							id="playerOne"
+						/>
+					)}
+
 					{!playerTwoName && (
 						<PlayerInput
 							id="playerTwo"
@@ -129,7 +152,32 @@ class Battle extends React.Component {
 							onSubmit={this.handleSubmit}
 						/>
 					)}
+
+					{playerTwoImage !== null && (
+						<PlayerPreview
+							avatar={playerTwoImage}
+							username={playerTwoName}
+							onReset={this.handleReset}
+							id="playerTwo"
+						/>
+					)}
 				</div>
+
+				{playerOneImage && playerTwoImage && (
+					<Link
+						className="button"
+						to={{
+							pathname: match.url + "/results",
+							search:
+								"?playerOneName=" +
+								playerOneName +
+								"&playerTwoName=" +
+								playerTwoName
+						}}
+					>
+						Battle
+					</Link>
+				)}
 			</div>
 		);
 	}
